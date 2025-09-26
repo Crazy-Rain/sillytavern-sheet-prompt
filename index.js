@@ -55,6 +55,10 @@
                 placeholder="Enter your sheet content here. This will be appended to your messages when enabled."
             >${settings.sheetContent}</textarea>
             <div class="sheet-prompt-info">
+                <span id="sheet-prompt-status">Ready</span> • 
+                <span id="sheet-prompt-count">0 characters</span>
+            </div>
+            <div class="sheet-prompt-info">
                 Content will be automatically appended to the end of your messages when enabled.
             </div>
         `;
@@ -66,11 +70,36 @@
     function bindUIEvents() {
         enableToggle = document.getElementById('sheet-prompt-enabled');
         sheetTextarea = document.getElementById('sheet-prompt-textarea');
+        const statusElement = document.getElementById('sheet-prompt-status');
+        const countElement = document.getElementById('sheet-prompt-count');
+
+        // Update character count
+        const updateCount = () => {
+            if (countElement && sheetTextarea) {
+                const count = sheetTextarea.value.length;
+                countElement.textContent = `${count} characters`;
+            }
+        };
+
+        // Update status
+        const updateStatus = () => {
+            if (statusElement) {
+                const hasContent = settings.sheetContent.trim().length > 0;
+                const status = settings.enabled 
+                    ? (hasContent ? 'Active' : 'Enabled (no content)')
+                    : 'Disabled';
+                statusElement.textContent = status;
+                statusElement.style.color = settings.enabled && hasContent ? '#4CAF50' : 
+                                          settings.enabled ? '#FF9800' : '#666';
+            }
+        };
 
         if (enableToggle) {
             enableToggle.addEventListener('change', (e) => {
                 settings.enabled = e.target.checked;
                 saveSettings();
+                updateStatus();
+                console.log(`[Sheet Prompt] Extension ${settings.enabled ? 'enabled' : 'disabled'}`);
             });
         }
 
@@ -78,12 +107,35 @@
             sheetTextarea.addEventListener('input', (e) => {
                 settings.sheetContent = e.target.value;
                 saveSettings();
+                updateCount();
+                updateStatus();
             });
+            
+            // Initial updates
+            updateCount();
         }
+        
+        updateStatus();
     }
 
     // Hook into message sending
     function interceptMessages() {
+        // Helper function to append sheet content
+        const appendSheetContent = (originalText) => {
+            if (!settings.enabled || !settings.sheetContent.trim()) {
+                return originalText;
+            }
+            
+            const sheetContent = settings.sheetContent.trim();
+            if (originalText.includes(sheetContent)) {
+                return originalText; // Already contains the content
+            }
+            
+            const result = originalText.trim() + '\n\n' + sheetContent;
+            console.log('[Sheet Prompt] Appended sheet content to message');
+            return result;
+        };
+
         // Multiple approaches to hook into SillyTavern's message sending
         
         // Approach 1: Hook into sendMessageAsUser function if it exists
@@ -91,9 +143,7 @@
             if (typeof window.sendMessageAsUser === 'function') {
                 const originalSendMessageAsUser = window.sendMessageAsUser;
                 window.sendMessageAsUser = function(text, ...args) {
-                    if (settings.enabled && settings.sheetContent.trim()) {
-                        text = text + '\n\n' + settings.sheetContent.trim();
-                    }
+                    text = appendSheetContent(text);
                     return originalSendMessageAsUser.call(this, text, ...args);
                 };
                 console.log('[Sheet Prompt] Hooked into sendMessageAsUser');
@@ -111,10 +161,12 @@
             if (sendButton && sendTextarea) {
                 sendButton.addEventListener('click', (e) => {
                     if (settings.enabled && settings.sheetContent.trim()) {
-                        const currentText = sendTextarea.value.trim();
-                        if (currentText && !currentText.includes(settings.sheetContent.trim())) {
-                            sendTextarea.value = currentText + '\n\n' + settings.sheetContent.trim();
-                        }
+                        setTimeout(() => {
+                            const currentText = sendTextarea.value.trim();
+                            if (currentText && !currentText.includes(settings.sheetContent.trim())) {
+                                sendTextarea.value = appendSheetContent(currentText);
+                            }
+                        }, 10);
                     }
                 });
                 console.log('[Sheet Prompt] Hooked into send button');
@@ -133,7 +185,7 @@
                     if (settings.enabled && settings.sheetContent.trim()) {
                         const currentText = sendTextarea.value.trim();
                         if (currentText && !currentText.includes(settings.sheetContent.trim())) {
-                            sendTextarea.value = currentText + '\n\n' + settings.sheetContent.trim();
+                            sendTextarea.value = appendSheetContent(currentText);
                         }
                     }
                 });
@@ -150,10 +202,12 @@
                 sendTextarea.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         if (settings.enabled && settings.sheetContent.trim()) {
-                            const currentText = sendTextarea.value.trim();
-                            if (currentText && !currentText.includes(settings.sheetContent.trim())) {
-                                sendTextarea.value = currentText + '\n\n' + settings.sheetContent.trim();
-                            }
+                            setTimeout(() => {
+                                const currentText = sendTextarea.value.trim();
+                                if (currentText && !currentText.includes(settings.sheetContent.trim())) {
+                                    sendTextarea.value = appendSheetContent(currentText);
+                                }
+                            }, 10);
                         }
                     }
                 });
@@ -176,7 +230,14 @@
         };
 
         // Retry periodically and on DOM changes
-        setInterval(setupHooks, 5000);
+        const retryInterval = setInterval(() => {
+            setupHooks();
+        }, 5000);
+
+        // Clean up interval after some time to avoid memory leaks
+        setTimeout(() => {
+            clearInterval(retryInterval);
+        }, 60000);
         
         const observer = new MutationObserver(() => {
             setupHooks();

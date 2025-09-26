@@ -44,4 +44,16 @@
     font-size: 12px;
     color: var(--grey50);
     font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#sheet-prompt-status {
+    font-weight: bold;
+    font-style: normal;
+}
+
+#sheet-prompt-count {
+    font-style: normal;
 }
