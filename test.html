@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sheet Prompt Extension Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        /* Mock SillyTavern CSS variables */
+        :root {
+            --grey70: #666666;
+            --black70c: rgba(0, 0, 0, 0.7);
+            --black30c: rgba(0, 0, 0, 0.3);
+            --grey100: #ffffff;
+            --white50: rgba(255, 255, 255, 0.5);
+            --grey50: #888888;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .mock-chat-form {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #2a2a2a;
+        }
+        
+        #send_textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #666;
+            border-radius: 3px;
+            background: #1a1a1a;
+            color: #ffffff;
+            resize: vertical;
+        }
+        
+        #send_but {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        #send_but:hover {
+            background: #0052a3;
+        }
+        
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #1a1a1a;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="test-container">
+        <h1>Sheet Prompt Extension Test</h1>
+        <p>This page simulates SillyTavern's basic structure for testing the Sheet Prompt extension.</p>
+        
+        <!-- Mock chat form -->
+        <div class="mock-chat-form">
+            <h3>Mock Chat Input</h3>
+            <form id="send_form">
+                <textarea id="send_textarea" placeholder="Type your message here..."></textarea>
+                <br>
+                <button type="submit" id="send_but">Send Message</button>
+            </form>
+        </div>
+        
+        <!-- Extension will be inserted here -->
+        <div id="extensions_settings">
+            <h3>Extensions</h3>
+            <!-- Sheet Prompt UI will appear here -->
+        </div>
+        
+        <!-- Log output -->
+        <div class="log" id="log">Extension loading...\n</div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Mock SillyTavern functions and behaviors
+        const log = document.getElementById('log');
+        
+        function addLog(message) {
+            log.textContent += new Date().toISOString() + ': ' + message + '\n';
+        }
+        
+        // Mock form submission
+        document.getElementById('send_form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const textarea = document.getElementById('send_textarea');
+            addLog('Message sent: ' + JSON.stringify(textarea.value));
+            textarea.value = ''; // Clear after "sending"
+        });
+        
+        // Override console.log to show in our log
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addLog(args.join(' '));
+        };
+        
+        addLog('Test environment ready');
+    </script>
+    <script src="index.js"></script>
+</body>
+</html>

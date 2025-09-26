@@ -1,0 +1,47 @@
+/* Sheet Prompt Extension Styles */
+.sheet-prompt-container {
+    margin: 10px 0;
+    padding: 15px;
+    border: 1px solid var(--grey70);
+    border-radius: 5px;
+    background: var(--black70c);
+}
+
+.sheet-prompt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.sheet-prompt-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sheet-prompt-textarea {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    padding: 8px;
+    border: 1px solid var(--grey70);
+    border-radius: 3px;
+    background: var(--black30c);
+    color: var(--grey100);
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.sheet-prompt-textarea:focus {
+    outline: none;
+    border-color: var(--white50);
+}
+
+.sheet-prompt-info {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--grey50);
+    font-style: italic;
+}
