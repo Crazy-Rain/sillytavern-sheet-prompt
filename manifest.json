@@ -1,0 +1,11 @@
+{
+    "name": "Sheet Prompt",
+    "display_name": "Sheet Prompt Extension",
+    "version": "1.0.0",
+    "description": "Adds a sheet system that appends predefined content to user messages",
+    "author": "Crazy-Rain",
+    "js": "index.js",
+    "css": "style.css",
+    "auto_update": true,
+    "requires": []
+}
