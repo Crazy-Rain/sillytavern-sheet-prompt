@@ -9,7 +9,8 @@
     // Default settings
     const defaultSettings = {
         enabled: true,
-        sheetContent: ''
+        sheetContent: '',
+        collapsed: false
     };
 
     let settings = { ...defaultSettings };
@@ -40,26 +41,33 @@
     // Create the extension UI
     function createUI() {
         const container = document.createElement('div');
-        container.className = 'sheet-prompt-container';
+        container.className = `sheet-prompt-container ${settings.collapsed ? 'collapsed' : ''}`;
         container.innerHTML = `
             <div class="sheet-prompt-header">
-                <span>Sheet Prompt</span>
+                <div class="sheet-prompt-title">
+                    <button class="sheet-prompt-collapse-btn" id="sheet-prompt-collapse">
+                        <span class="collapse-icon">${settings.collapsed ? '▶' : '▼'}</span>
+                    </button>
+                    <span>Sheet Prompt</span>
+                </div>
                 <div class="sheet-prompt-toggle">
                     <label for="sheet-prompt-enabled">Enabled:</label>
                     <input type="checkbox" id="sheet-prompt-enabled" ${settings.enabled ? 'checked' : ''}>
                 </div>
             </div>
-            <textarea 
-                id="sheet-prompt-textarea" 
-                class="sheet-prompt-textarea" 
-                placeholder="Enter your sheet content here. This will be appended to your messages when enabled."
-            >${settings.sheetContent}</textarea>
-            <div class="sheet-prompt-info">
-                <span id="sheet-prompt-status">Ready</span> • 
-                <span id="sheet-prompt-count">0 characters</span>
-            </div>
-            <div class="sheet-prompt-info">
-                Content will be automatically appended to the end of your messages when enabled.
+            <div class="sheet-prompt-content" ${settings.collapsed ? 'style="display: none;"' : ''}>
+                <textarea 
+                    id="sheet-prompt-textarea" 
+                    class="sheet-prompt-textarea" 
+                    placeholder="Enter your sheet content here. This will be appended to your messages when enabled."
+                >${settings.sheetContent}</textarea>
+                <div class="sheet-prompt-info">
+                    <span id="sheet-prompt-status">Ready</span> • 
+                    <span id="sheet-prompt-count">0 characters</span>
+                </div>
+                <div class="sheet-prompt-info">
+                    Content will be automatically appended to the end of your messages when enabled.
+                </div>
             </div>
         `;
 
@@ -72,6 +80,9 @@
         sheetTextarea = document.getElementById('sheet-prompt-textarea');
         const statusElement = document.getElementById('sheet-prompt-status');
         const countElement = document.getElementById('sheet-prompt-count');
+        const collapseButton = document.getElementById('sheet-prompt-collapse');
+        const contentArea = document.querySelector('.sheet-prompt-content');
+        const container = document.querySelector('.sheet-prompt-container');
 
         // Update character count
         const updateCount = () => {
@@ -93,6 +104,28 @@
                                           settings.enabled ? '#FF9800' : '#666';
             }
         };
+
+        // Handle collapse/expand
+        if (collapseButton && contentArea && container) {
+            collapseButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                settings.collapsed = !settings.collapsed;
+                saveSettings();
+                
+                // Update UI
+                if (settings.collapsed) {
+                    contentArea.style.display = 'none';
+                    container.classList.add('collapsed');
+                    collapseButton.querySelector('.collapse-icon').textContent = '▶';
+                } else {
+                    contentArea.style.display = 'block';
+                    container.classList.remove('collapsed');
+                    collapseButton.querySelector('.collapse-icon').textContent = '▼';
+                }
+                
+                console.log(`[Sheet Prompt] Extension ${settings.collapsed ? 'collapsed' : 'expanded'}`);
+            });
+        }
 
         if (enableToggle) {
             enableToggle.addEventListener('change', (e) => {

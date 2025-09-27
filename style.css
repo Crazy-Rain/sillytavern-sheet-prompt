@@ -15,10 +15,53 @@
     font-weight: bold;
 }
 
+.sheet-prompt-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sheet-prompt-collapse-btn {
+    background: none;
+    border: none;
+    color: var(--grey100);
+    cursor: pointer;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1;
+    user-select: none;
+}
+
+.sheet-prompt-collapse-btn:hover {
+    color: var(--white50);
+}
+
+.collapse-icon {
+    display: inline-block;
+    width: 12px;
+    text-align: center;
+}
+
 .sheet-prompt-toggle {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.sheet-prompt-content {
+    transition: opacity 0.2s ease;
+}
+
+.sheet-prompt-container.collapsed .sheet-prompt-content {
+    display: none !important;
+}
+
+.sheet-prompt-container.collapsed {
+    padding-bottom: 15px;
+}
+
+.sheet-prompt-container.collapsed .sheet-prompt-header {
+    margin-bottom: 0;
 }
 
 .sheet-prompt-textarea {
@@ -32,6 +75,7 @@
     color: var(--grey100);
     font-family: monospace;
     font-size: 13px;
+    margin-bottom: 8px;
 }
 
 .sheet-prompt-textarea:focus {
